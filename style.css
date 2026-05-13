@@ -1,4 +1,22 @@
 body {
+  margin: 0;
+  background: #111;
+  color: white;
+  font-family: Arial;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding-top: 40px;
+}
+
+h1 {
+  font-size: 52px;
+  margin-bottom: 25px;
+}
+
+.config {
   display: flex;
   gap: 10px;
   margin-bottom: 25px;
