@@ -13,7 +13,16 @@ if(savedIp){
 
 async function conectar(){
 
+  console.log("BOTAO CONNECT");
+
   const ip = ipInput.value.trim();
+
+  if(!ip){
+
+    statusEl.innerHTML = "digite IP";
+
+    return;
+  }
 
   API = "http://" + ip;
 
@@ -21,7 +30,7 @@ async function conectar(){
 
   statusEl.innerHTML = "conectando...";
 
-  console.log(API);
+  console.log("API:", API);
 
   try{
 
@@ -38,7 +47,7 @@ async function conectar(){
 
     statusEl.innerHTML = "conectado";
 
-    status();
+    setTimeout(status, 500);
 
   }catch(e){
 
@@ -93,6 +102,8 @@ async function status(){
 }
 
 async function clicar(n){
+
+  console.log("BOTAO:", n);
 
   if(!API) return;
 
@@ -149,4 +160,28 @@ async function reiniciar(){
   }
 }
 
-setInterval(status, 700);
+document
+  .getElementById("connectBtn")
+  .addEventListener("click", conectar);
+
+document
+  .getElementById("b0")
+  .addEventListener("click", () => clicar(0));
+
+document
+  .getElementById("b1")
+  .addEventListener("click", () => clicar(1));
+
+document
+  .getElementById("b2")
+  .addEventListener("click", () => clicar(2));
+
+document
+  .getElementById("b3")
+  .addEventListener("click", () => clicar(3));
+
+document
+  .getElementById("restartBtn")
+  .addEventListener("click", reiniciar);
+
+setInterval(status, 2500);
