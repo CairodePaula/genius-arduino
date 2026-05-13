@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=UTF-8>
+<meta name=viewport content='width=device-width,initial-scale=1,user-scalable=no'>
+<title>GENIUS</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:monospace;color:#fff;gap:20px}
+h1{font-size:28px;letter-spacing:6px;color:#fff}
+#fase{font-size:14px;color:#888}
+#status{font-size:16px;color:#aaa;min-height:24px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:10px}
+.btn{width:140px;height:140px;border-radius:20px;border:none;cursor:pointer;opacity:0.35;transition:opacity 0.1s;-webkit-tap-highlight-color:transparent}
+.btn.aceso{opacity:1}
+.btn:active{opacity:0.8}
+#b0{background:#e74c3c}
+#b1{background:#f1c40f}
+#b2{background:#2ecc71}
+#b3{background:#3498db}
+#restart{background:none;border:1px solid #444;color:#888;padding:10px 24px;border-radius:8px;font-size:14px;cursor:pointer;font-family:monospace;display:none}
+#restart:hover{border-color:#888;color:#fff}
+</style>
+</head>
+<body>
+<h1>GENIUS</h1>
+<div id=fase>fase 1</div>
+<div id=status>aguardando...</div>
+<div class=grid>
+  <button class=btn id=b0 onclick=pressBtn(0)></button>
+  <button class=btn id=b1 onclick=pressBtn(1)></button>
+  <button class=btn id=b2 onclick=pressBtn(2)></button>
+  <button class=btn id=b3 onclick=pressBtn(3)></button>
+</div>
+<button id=restart onclick=reiniciar()>jogar novamente</button>
+
+<script>
+var IP = 'http://192.168.4.1';
+var esperando = false;
+var podeClicar = true;
+
+function setStatus(txt, cor) {
+  var s = document.getElementById('status');
+  s.textContent = txt;
+  s.style.color = cor || '#aaa';
+}
+
+function acendeLED(n, ms) {
+  var b = document.getElementById('b'+n);
+  b.classList.add('aceso');
+  setTimeout(function(){ b.classList.remove('aceso'); }, ms || 400);
+}
+
+function pressBtn(n) {
+  if(!esperando || !podeClicar) return;
+  podeClicar = false;
+  acendeLED(n, 300);
+  fetch(IP+'/btn?n='+n)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      document.getElementById('fase').textContent = 'fase '+d.fase;
+      if(d.ok === false) {
+        setStatus('errou! game over', '#e74c3c');
+        esperando = false;
+        document.getElementById('restart').style.display = 'block';
+      } else {
+        setStatus('certo!', '#2ecc71');
+        setTimeout(function(){
+          setStatus('sua vez...', '#aaa');
+          podeClicar = true;
+        }, 600);
+      }
+    })
+    .catch(function(){
+      podeClicar = true;
+    });
+}
+
+function reiniciar() {
+  document.getElementById('restart').style.display = 'none';
+  setStatus('reiniciando...', '#aaa');
+  esperando = false;
+  fetch(IP+'/restart')
+    .then(function(){ setStatus('aguardando...', '#aaa'); })
+    .catch(function(){});
+}
+
+function pollEstado() {
+  fetch(IP+'/e')
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      document.getElementById('fase').textContent = 'fase '+d.fase;
+      if(d.perdeu) {
+        setStatus('errou! game over', '#e74c3c');
+        esperando = false;
+        document.getElementById('restart').style.display = 'block';
+      } else if(d.mostrando) {
+        setStatus('observe...', '#f1c40f');
+        esperando = false;
+        podeClicar = false;
+      } else if(d.esperando) {
+        if(!esperando) setStatus('sua vez!', '#2ecc71');
+        esperando = true;
+        podeClicar = true;
+      }
+    })
+    .catch(function(){
+      setStatus('conectando...', '#888');
+    });
+}
+
+setInterval(pollEstado, 500);
+</script>
+</body>
+</html>
