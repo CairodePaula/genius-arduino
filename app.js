@@ -1,4 +1,50 @@
 let API = "";
+
+const statusEl = document.getElementById("status");
+
+const ipInput = document.getElementById("ip");
+
+const savedIp = localStorage.getItem("arduino_ip");
+
+if(savedIp) {
+
+  ipInput.value = savedIp;
+
+  conectar();
+}
+
+async function conectar() {
+
+  const ip = ipInput.value.trim();
+
+  API = "http://" + ip;
+
+  localStorage.setItem("arduino_ip", ip);
+
+  console.log("API:", API);
+
+  statusEl.innerHTML = "conectando...";
+
+  try {
+
+    const r = await fetch(API + "/e");
+
+    console.log(r);
+
+    const d = await r.json();
+
+    console.log(d);
+
+    statusEl.innerHTML = "conectado";
+
+  } catch(e) {
+
+    console.log(e);
+
+    statusEl.innerHTML = "erro";
+  }
+}
+
 async function status() {
 
   if(!API) return;
