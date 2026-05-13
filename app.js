@@ -184,4 +184,4 @@ document
   .getElementById("restartBtn")
   .addEventListener("click", reiniciar);
 
-setInterval(status, 2500);
+setInterval(status, 4000);
