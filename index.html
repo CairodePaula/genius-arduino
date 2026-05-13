@@ -1,144 +1,18 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
 
   <meta charset="UTF-8">
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0"
+    content="width=device-width,initial-scale=1,user-scalable=no"
   >
 
   <title>Genius Arduino</title>
 
-  <style>
-
-    body{
-
-      margin:0;
-
-      background:#111;
-
-      color:white;
-
-      font-family:Arial;
-
-      display:flex;
-
-      flex-direction:column;
-
-      align-items:center;
-
-      padding-top:40px;
-    }
-
-    h1{
-
-      font-size:52px;
-
-      margin-bottom:25px;
-    }
-
-    .config{
-
-      display:flex;
-
-      gap:10px;
-
-      margin-bottom:25px;
-    }
-
-    input{
-
-      padding:12px;
-
-      border:none;
-
-      border-radius:10px;
-
-      width:190px;
-
-      font-size:16px;
-    }
-
-    button{
-
-      border:none;
-
-      border-radius:12px;
-
-      cursor:pointer;
-    }
-
-    .connect{
-
-      padding:12px 18px;
-
-      font-size:16px;
-    }
-
-    #status{
-
-      font-size:24px;
-
-      margin-bottom:25px;
-    }
-
-    .grid{
-
-      display:grid;
-
-      grid-template-columns:1fr 1fr;
-
-      gap:15px;
-    }
-
-    .btn{
-
-      width:140px;
-
-      height:140px;
-
-      border-radius:24px;
-
-      opacity:.35;
-
-      transition:.15s;
-    }
-
-    .btn:active{
-
-      opacity:1;
-
-      transform:scale(.96);
-    }
-
-    .red{
-      background:#e74c3c;
-    }
-
-    .yellow{
-      background:#f1c40f;
-    }
-
-    .green{
-      background:#2ecc71;
-    }
-
-    .blue{
-      background:#3498db;
-    }
-
-    .restart{
-
-      margin-top:25px;
-
-      padding:14px 24px;
-
-      font-size:18px;
-    }
-
-  </style>
+  <link rel="stylesheet" href="style.css">
 
 </head>
 
@@ -155,7 +29,7 @@
 
     <button
       class="connect"
-      onclick="conectar()"
+      id="connectBtn"
     >
       conectar
     </button>
@@ -168,31 +42,19 @@
 
   <div class="grid">
 
-    <button
-      class="btn red"
-      onclick="clicar(0)"
-    ></button>
+    <button class="btn red" id="b0"></button>
 
-    <button
-      class="btn yellow"
-      onclick="clicar(1)"
-    ></button>
+    <button class="btn yellow" id="b1"></button>
 
-    <button
-      class="btn green"
-      onclick="clicar(2)"
-    ></button>
+    <button class="btn green" id="b2"></button>
 
-    <button
-      class="btn blue"
-      onclick="clicar(3)"
-    ></button>
+    <button class="btn blue" id="b3"></button>
 
   </div>
 
   <button
     class="restart"
-    onclick="reiniciar()"
+    id="restartBtn"
   >
     reiniciar
   </button>
