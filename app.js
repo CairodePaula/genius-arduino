@@ -6,14 +6,12 @@ const ipInput = document.getElementById("ip");
 
 const savedIp = localStorage.getItem("arduino_ip");
 
-if(savedIp) {
+if(savedIp){
 
   ipInput.value = savedIp;
-
-  conectar();
 }
 
-async function conectar() {
+async function conectar(){
 
   const ip = ipInput.value.trim();
 
@@ -21,15 +19,18 @@ async function conectar() {
 
   localStorage.setItem("arduino_ip", ip);
 
-  console.log("API:", API);
-
   statusEl.innerHTML = "conectando...";
 
-  try {
+  console.log(API);
 
-    const r = await fetch(API + "/e");
+  try{
 
-    console.log(r);
+    const r = await fetch(API + "/e", {
+
+      method:"GET",
+
+      mode:"cors"
+    });
 
     const d = await r.json();
 
@@ -37,7 +38,9 @@ async function conectar() {
 
     statusEl.innerHTML = "conectado";
 
-  } catch(e) {
+    status();
+
+  }catch(e){
 
     console.log(e);
 
@@ -45,79 +48,102 @@ async function conectar() {
   }
 }
 
-async function status() {
+async function status(){
 
   if(!API) return;
 
-  try {
+  try{
 
-    const r = await fetch(API + "/e");
+    const r = await fetch(API + "/e", {
+
+      method:"GET",
+
+      mode:"cors"
+    });
 
     const d = await r.json();
 
-    if(d.perdeu) {
+    if(d.perdeu){
 
       statusEl.innerHTML = "game over";
 
       return;
     }
 
-    if(d.mostrando) {
+    if(d.mostrando){
 
       statusEl.innerHTML = "observe";
 
       return;
     }
 
-    if(d.esperando) {
+    if(d.esperando){
 
       statusEl.innerHTML = "sua vez";
 
       return;
     }
 
-  } catch(e) {
+  }catch(e){
+
+    console.log(e);
 
     statusEl.innerHTML = "offline";
   }
 }
 
-async function clicar(n) {
+async function clicar(n){
 
   if(!API) return;
 
-  try {
+  try{
 
-    const r = await fetch(API + "/btn?n=" + n);
+    const r = await fetch(
+      API + "/btn?n=" + n,
+      {
+        method:"GET",
+        mode:"cors"
+      }
+    );
 
     const d = await r.json();
 
-    if(d.ok) {
+    if(d.ok){
 
       statusEl.innerHTML = "acertou";
 
-    } else {
+    }else{
 
       statusEl.innerHTML = "errou";
     }
 
-  } catch(e) {
+  }catch(e){
+
+    console.log(e);
 
     statusEl.innerHTML = "erro";
   }
 }
 
-async function reiniciar() {
+async function reiniciar(){
 
   if(!API) return;
 
-  try {
+  try{
 
-    await fetch(API + "/restart");
+    await fetch(
+      API + "/restart",
+      {
+        method:"GET",
+        mode:"cors"
+      }
+    );
 
     statusEl.innerHTML = "reiniciado";
 
-  } catch(e) {
+  }catch(e){
+
+    console.log(e);
 
     statusEl.innerHTML = "erro";
   }
