@@ -1,4 +1,12 @@
 let API = "";
+async function status() {
+
+  if(!API) return;
+
+  try {
+
+    const r = await fetch(API + "/e");
+
     const d = await r.json();
 
     if(d.perdeu) {
