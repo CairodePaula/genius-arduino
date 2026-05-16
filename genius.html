@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GENIUS</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d0d0d;
+      color: #fff;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 24px;
+    }
+
+    h1 {
+      font-size: 3rem;
+      letter-spacing: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow: 0 0 30px rgba(255,255,255,0.3);
+    }
+
+    #status-box {
+      font-size: 1.2rem;
+      padding: 10px 28px;
+      border-radius: 30px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      min-width: 260px;
+      text-align: center;
+      transition: all 0.3s;
+      color: #aaa;
+    }
+
+    #status-box.acertou { color: #2ecc71; border-color: #2ecc71; background: #0d2e1a; }
+    #status-box.errou   { color: #e74c3c; border-color: #e74c3c; background: #2e0d0d; }
+    #status-box.aguarde { color: #f39c12; border-color: #f39c12; background: #2e1f00; }
+    #status-box.jogar   { color: #2ecc71; border-color: #2ecc71; background: #0d2e1a;
+                          animation: pulsa-status 1s infinite; }
+
+    @keyframes pulsa-status {
+      0%, 100% { box-shadow: 0 0 0px #2ecc71; }
+      50%       { box-shadow: 0 0 18px #2ecc71; }
+    }
+
+    #fase-display {
+      font-size: 1rem;
+      color: #555;
+      letter-spacing: 4px;
+    }
+
+    .genius-circle {
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 8px;
+      padding: 8px;
+      background: #111;
+      box-shadow: 0 0 60px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5);
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.3s;
+    }
+
+    .genius-circle.jogar {
+      box-shadow: 0 0 60px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5),
+                  0 0 0 4px #2ecc71, 0 0 24px #2ecc71;
+      animation: pulsa-anel 1s infinite;
+    }
+
+    @keyframes pulsa-anel {
+      0%, 100% { box-shadow: 0 0 60px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5),
+                             0 0 0 4px #2ecc71, 0 0 10px #2ecc71; }
+      50%       { box-shadow: 0 0 60px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5),
+                             0 0 0 4px #2ecc71, 0 0 30px #2ecc71; }
+    }
+
+    .btn {
+      border: none;
+      cursor: not-allowed;
+      opacity: 0.15;
+      transition: opacity 0.2s, filter 0.2s;
+      position: relative;
+    }
+
+    .genius-circle.jogar .btn {
+      cursor: pointer;
+      opacity: 0.35;
+    }
+
+    .genius-circle.jogar .btn:hover {
+      opacity: 0.55;
+    }
+
+    .btn.active { opacity: 1 !important; filter: brightness(1.4); }
+
+    #b0 { background: #c0392b; border-radius: 100% 0 0 0; }
+    #b1 { background: #d4ac0d; border-radius: 0 100% 0 0; }
+    #b2 { background: #27ae60; border-radius: 0 0 0 100%; }
+    #b3 { background: #2980b9; border-radius: 0 0 100% 0; }
+
+    .genius-circle::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80px;
+      height: 80px;
+      background: #111;
+      border-radius: 50%;
+      z-index: 10;
+      border: 3px solid #222;
+    }
+
+    #reiniciar {
+      padding: 12px 36px;
+      font-size: 1rem;
+      border: 1px solid #444;
+      background: transparent;
+      color: #888;
+      border-radius: 30px;
+      cursor: pointer;
+      letter-spacing: 2px;
+      transition: all 0.2s;
+    }
+    #reiniciar:hover { border-color: #888; color: #fff; }
+
+    #ip-config {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    #ip-config input {
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid #333;
+      background: #1a1a1a;
+      color: #fff;
+      font-size: 0.9rem;
+      width: 180px;
+      text-align: center;
+    }
+    #ip-config button {
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid #444;
+      background: transparent;
+      color: #888;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    #ip-config button:hover { color: #fff; border-color: #888; }
+
+    #conn-status {
+      font-size: 0.75rem;
+      color: #444;
+      letter-spacing: 2px;
+    }
+    #conn-status.ok  { color: #27ae60; }
+    #conn-status.err { color: #e74c3c; }
+  </style>
+</head>
+<body>
+
+  <h1>GENIUS</h1>
+
+  <div id="ip-config">
+    <input type="text" id="ip-input" value="" placeholder="IP do Arduino">
+    <button onclick="salvarIP()">Conectar</button>
+  </div>
+
+  <div id="conn-status">⬤ aguardando conexão...</div>
+  <div id="fase-display">FASE —</div>
+  <div id="status-box">Conecte ao Arduino acima</div>
+
+  <div class="genius-circle" id="circle">
+    <button class="btn" id="b0" onclick="pressionar(0)"></button>
+    <button class="btn" id="b1" onclick="pressionar(1)"></button>
+    <button class="btn" id="b2" onclick="pressionar(2)"></button>
+    <button class="btn" id="b3" onclick="pressionar(3)"></button>
+  </div>
+
+  <button id="reiniciar" onclick="reiniciar()">↺ REINICIAR</button>
+
+  <script>
+    let arduinoIP = localStorage.getItem('arduinoIP') || '';
+    let travado = false;
+    let faseAtual = 0;
+
+    document.getElementById('ip-input').value = arduinoIP;
+
+    function salvarIP() {
+      arduinoIP = document.getElementById('ip-input').value.trim();
+      localStorage.setItem('arduinoIP', arduinoIP);
+      setStatus('Conectando...', '');
+      verificarConexao();
+    }
+
+    async function verificarConexao() {
+      if (!arduinoIP) return;
+      try {
+        const r = await fetch(`http://${arduinoIP}/status`, { signal: AbortSignal.timeout(3000) });
+        const d = await r.json();
+        faseAtual = d.fase;
+        document.getElementById('fase-display').textContent = `FASE ${faseAtual + 1}`;
+        document.getElementById('conn-status').textContent = '⬤ conectado';
+        document.getElementById('conn-status').className = 'ok';
+        if (d.mostrando) {
+          setStatus('Observe a sequência...', 'aguarde');
+          bloquear(true);
+        } else if (d.esperando) {
+          setStatus('🟢 SUA VEZ! Repita a sequência.', 'jogar');
+          bloquear(false);
+        }
+      } catch(e) {
+        document.getElementById('conn-status').textContent = '⬤ sem conexão';
+        document.getElementById('conn-status').className = 'err';
+        setStatus('Verifique: Arduino ligado e no mesmo WiFi', 'errou');
+      }
+    }
+
+    function setStatus(msg, cls) {
+      const el = document.getElementById('status-box');
+      el.textContent = msg;
+      el.className = cls;
+    }
+
+    function bloquear(sim) {
+      travado = sim;
+      const circle = document.getElementById('circle');
+      if (sim) {
+        circle.classList.remove('jogar');
+      } else {
+        circle.classList.add('jogar');
+      }
+    }
+
+    async function pressionar(n) {
+      if (travado) return;
+      travado = true;
+
+      const btn = document.getElementById('b' + n);
+      btn.classList.add('active');
+      setTimeout(() => btn.classList.remove('active'), 200);
+
+      try {
+        const r = await fetch(`http://${arduinoIP}/btn?n=${n}`, {
+          signal: AbortSignal.timeout(3000)
+        });
+        const d = await r.json();
+
+        if (d.ok) {
+          setStatus('✓ Acertou!', 'acertou');
+          faseAtual = d.fase;
+          document.getElementById('fase-display').textContent = `FASE ${faseAtual + 1}`;
+
+          if (d.acertou && d.fase > faseAtual - 1) {
+            setTimeout(() => {
+              setStatus('Observe a sequência...', 'aguarde');
+              bloquear(true);
+              const tempoSeq = 800 + (faseAtual + 1) * 500 + 500;
+              setTimeout(() => {
+                setStatus('🟢 SUA VEZ! Repita a sequência.', 'jogar');
+                bloquear(false);
+              }, tempoSeq);
+            }, 300);
+          } else {
+            setTimeout(() => {
+              travado = false;
+              setStatus('🟢 SUA VEZ! Continue...', 'jogar');
+            }, 100);
+          }
+        } else {
+          setStatus('✗ ERROU! Reiniciando...', 'errou');
+          bloquear(true);
+          faseAtual = 0;
+          document.getElementById('fase-display').textContent = 'FASE 1';
+          setTimeout(() => {
+            setStatus('Observe a nova sequência...', 'aguarde');
+            setTimeout(() => {
+              setStatus('🟢 SUA VEZ! Repita a sequência.', 'jogar');
+              bloquear(false);
+            }, 2500);
+          }, 500);
+        }
+      } catch(e) {
+        travado = false;
+        btn.classList.remove('active');
+      }
+    }
+
+    function reiniciar() {
+      location.reload();
+    }
+
+    verificarConexao();
+
+    setInterval(() => {
+      if (document.getElementById('conn-status').className === 'err' ||
+          document.getElementById('conn-status').textContent.includes('aguardando')) {
+        verificarConexao();
+      }
+    }, 5000);
+
+  </script>
+</body>
+</html>
